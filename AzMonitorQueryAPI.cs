@@ -52,7 +52,7 @@ namespace RaceTrac.Function
 
             var clientID = Environment.GetEnvironmentVariable("Managed_Identity_Client_ID");
             
-            log.LogInformation("Client id is {0}",clientID);
+            //log.LogInformation("Client id is {0}",clientID);
             var credentialOptions = new DefaultAzureCredentialOptions
             {
                 ManagedIdentityClientId = clientID
@@ -60,7 +60,7 @@ namespace RaceTrac.Function
             
             string workspaceId = Environment.GetEnvironmentVariable("Log_Analytics_Workspace_ID");
             
-            log.LogInformation("workspaceID = {0}",workspaceId);
+            //log.LogInformation("workspaceID = {0}",workspaceId);
             var client = new LogsQueryClient(new DefaultAzureCredential(credentialOptions));
 
             // build the KQL query
@@ -72,10 +72,14 @@ namespace RaceTrac.Function
 
             log.LogInformation("kqlQuery = {0}",kqlQuery);
 
+            int startTick = Environment.TickCount & Int32.MaxValue;
+
             Response<LogsQueryResult> result = await client.QueryWorkspaceAsync(
             workspaceId,
             kqlQuery,
             QueryTimeRange.All);
+            int endTick = Environment.TickCount & Int32.MaxValue;
+            log.LogInformation("It took {0} ms to execute the KQL query",endTick-startTick);
 
             LogsTable table = result.Value.Table;
 
