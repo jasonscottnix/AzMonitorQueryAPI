@@ -3,7 +3,7 @@
 
 name: Build and deploy dotnet core app to Azure Function App - AzMonitorQueryAPI
 
-on: 
+on: |+
   push:
     branches:
       - master
@@ -16,9 +16,7 @@ env:
 jobs:
   build-and-deploy:
     runs-on: windows-latest
-    permissions:
-      id-token: write #This is required for requesting the JWT
-
+    
     steps:
       - name: 'Checkout GitHub Action'
         uses: actions/checkout@v4
@@ -35,13 +33,6 @@ jobs:
           dotnet build --configuration Release --output ./output
           popd
       
-      - name: Login to Azure
-        uses: azure/login@v1
-        with:
-          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_821A97137EFF4498ADA60D334521F234 }}
-          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_36CAE6F15BC04C29910CE6140E01DEC2 }}
-          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_D3F0245A6A9F425691A41AB8968E1A78 }}
-
       - name: 'Run Azure Functions Action'
         uses: Azure/functions-action@v1
         id: fa
@@ -49,4 +40,4 @@ jobs:
           app-name: 'AzMonitorQueryAPI'
           slot-name: 'Production'
           package: '${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}/output'
-          
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_215211D8315240B091B7E5DE711BBC83 }}
