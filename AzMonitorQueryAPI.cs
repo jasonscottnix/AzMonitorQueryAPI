@@ -42,6 +42,14 @@ namespace RaceTrac.Function
             string sDate=req.Query["incidentDate"];
             sDate ??= data?.incidentDate;
 
+            // If we don't have both store # and incident date, then return error
+            if(sStoreNumber == null || sStoreNumber.Length <1 || sDate == null || sDate.Length < 1)
+            {
+                log.LogError("Missing either store number or incident date.  Both are required.");
+                return new BadRequestResult();
+            }
+            
+
             var clientID = Environment.GetEnvironmentVariable("Managed_Identity_Client_ID");
             
             log.LogInformation("Client id is {0}",clientID);
